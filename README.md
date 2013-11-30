@@ -21,14 +21,18 @@ no) where play is specified as the decision attribute).
 Input Parameters: 
 When executed, your program should prompt the user for the following: 
  
- Name of the input file 
- A selection of the attributes that are to be considered the decision 
+
+Name of the input file 
+
+A selection of the attributes that are to be considered the decision 
 attributes; an enumerated menu would be nice here so that the user 
 doesn’t have to type out the names of the attributes they want, and can’t 
 enter names of attributes that don’t actually exist in the input file 
- The maximum number of attributes to consider for a covering (e.g., maybe 
+
+The maximum number of attributes to consider for a covering (e.g., maybe 
 we only want to see coverings of size 3 or smaller) 
- The minimum coverage required for a rule to be reported (e.g., maybe we 
+
+The minimum coverage required for a rule to be reported (e.g., maybe we 
 only want to see rules that apply to at least 3 rows)  Whether or not unnecessary conditions should be dropped in the rules 
 that are reported 
  
@@ -36,15 +40,17 @@ Output:
 Your program should produce neatly formatted output that includes the 
 following: 
  
- Values for all of the input parameters 
- Distribution of values for the decision attributes, both individually and 
+Values for all of the input parameters 
+
+Distribution of values for the decision attributes, both individually and 
 combined (e.g., for the weather dataset if the user specifies that the 
 decision attributes are outlook and play, you should output the number of 
 occurrences of each value for outlook (sunny, overcast, and rainy), the 
 number of occurrences of each value for play (yes, no), and the number 
 of occurrences of each possible combination of outlook and play values 
 ((sunny, yes), (overcast, yes), (rainy, yes), (sunny, no), etc.)) 
- All coverings, and for each covering the rules, and for each rule the 
+
+All coverings, and for each covering the rules, and for each rule the 
 coverage of that rule 
  
 Because the datasets can contain many attributes, we do not want to report the 
@@ -98,15 +104,18 @@ conditions from rules.
 What To Submit For Grading: 
 You will need to make a zip file containing the following: 
  
- Well-commented source code files for your program. 
- A text file containing simple instructions for how to compile and execute 
+Well-commented source code files for your program. 
+
+A text file containing simple instructions for how to compile and execute 
 your program on one of the cslinux computers. 
- A report in pdf format that includes the details of a variety of test cases 
+
+A report in pdf format that includes the details of a variety of test cases 
 (e.g., input file contents, input parameters, and output) to sufficiently show 
 that your program correctly performs all the required functionality for the 
 project. If you do not submit this report, you will receive a zero on the 
 project! 
- Any data files you tested (other than table3_10_fg.arff and 
+
+Any data files you tested (other than table3_10_fg.arff and 
 wilkinsonMatrix.arff), the results of which are included in your pdf report. 
  
 Name this file using the combination of the last names of the two people who 
@@ -114,3 +123,4 @@ worked on the project (e.g., if John Smith and Jane Doe worked together, their
 submission should be named smithdoe.zip or doesmith.zip). Submit only this zip 
 file via Blackboard. Below are instructions. You can submit multiple times before 
 the deadline; only your last submission will be graded. 
+
