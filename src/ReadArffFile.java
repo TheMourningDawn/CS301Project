@@ -14,7 +14,7 @@ public class ReadArffFile {
 	}
 	
 	
-	
+	//TODO: Depending on what we decide needs to be done to this data, we might need to read it into different structures
 	public void readFile(){
 		UserInterface.logData.setText(UserInterface.logData.getText() + "Starting to read file: " + input.getName());
 		
@@ -31,22 +31,22 @@ public class ReadArffFile {
 			while((currentLine = reader.readLine()).contains("@attribute")){
 				//Put in our attributeTypes
 				Attribute oneAttribute = new Attribute(currentLine.split(" ")[1],currentLine.split(" ")[2]);
-				lotsOData.attributeTypes.add(oneAttribute);
+				lotsOData.attributeData.add(oneAttribute);
 			}
 			if(reader.readLine().equals("@data")){ //I dont NEED to do this, but im going to, to make sure
 				while((currentLine = reader.readLine()) != null){ //Should be able to read till the end of the file
-					//Make a new list of attributes called instance (eg x1,x2,...)
-					List<Attribute> instance = new ArrayList<Attribute>();
-					for(int i=0;i<lotsOData.attributeTypes.size();i++){
-						Attribute oneAttribute = lotsOData.attributeTypes.get(i);
-						oneAttribute.instanceValue = currentLine.split(",")[i];
-						//TODO: Probably need to calculate the number of possible values for this instance type here
-						instance.add(oneAttribute);
+					for(int i=0;i<lotsOData.attributeData.size();i++){
+						//read in the actual data for each of the attributes {a,b,c..}
+						lotsOData.attributeData.get(i).instanceValues.add(currentLine.split(",")[i]);
 					}
-					lotsOData.instances.add(instance);
 				}
 			} else {
 				//TODO: Freak out, maybe print something later if this matters (No @data where expected)
+			}
+			//Now find the unique values since we have read in all the data
+			//TODO: Not sure we need this at all. Keeping for now.
+			for(int i=0;i<lotsOData.attributeData.size();i++){
+				lotsOData.attributeData.get(i).getUniqueValues();
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -54,15 +54,20 @@ public class ReadArffFile {
 		}
 	}
 	
+	//Method for printing out what I've read in.
 	public void printRelation(){
 		System.out.println("Relation name: " + lotsOData.relationName + "\n");
-		for(List<Attribute> instance:lotsOData.instances){
-			System.out.println("Instance: \n");
-			for(Attribute attr:instance){
-				System.out.println("    ColName: " + attr.instanceName);
-				System.out.println("    ColType: " + attr.instanceValueType);
-				System.out.println("    InstanceValue: " + attr.instanceValue);
+		String attrName = "   ";
+		for(int j=0;j<lotsOData.attributeData.size();j++){
+			attrName += " " + lotsOData.attributeData.get(j).instanceName;
+		}
+		System.out.println(attrName);
+		for(int i=0;i<lotsOData.attributeData.get(0).instanceValues.size();i++){
+			String oneLine = "x" + i + ":";
+			for(int j=0;j<lotsOData.attributeData.size();j++){
+				oneLine += " " + lotsOData.attributeData.get(j).instanceValues.get(i);
 			}
+			System.out.println(oneLine);
 		}
 	}
 	

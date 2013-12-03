@@ -4,8 +4,7 @@ import java.util.List;
 
 public class Relation {
 	public String relationName;
-	public List<Attribute> attributeTypes = new ArrayList<Attribute>();
-	public List<List<Attribute>> instances = new ArrayList<List<Attribute>>();
+	public List<Attribute> attributeData = new ArrayList<Attribute>();
 
 	public Relation() {
 		// TODO Auto-generated constructor stub
