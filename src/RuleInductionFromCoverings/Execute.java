@@ -34,6 +34,19 @@ public class Execute {
 		}
 	}
 	
+	// Gets all possible values for a given attribute, for output and for ez partitioning
+	public Set<String> getPossibleValuesFor(List<String> attribute_values) {
+		Set<String> unique_values = new HashSet<String>();
+		
+		for (String value : attribute_values) {
+			if (!unique_values.contains(value)) {
+				unique_values.add(value);
+			}
+		}
+		
+		return unique_values;
+	}
+	
 	public Set<List<String>> computePartition(List<String> nonDec,List<String> dec){
 		Set<List<Integer>> combinedNonDec = new HashSet<List<Integer>>();
 		for(int i=0;i<relation.attributeData.get(0).instanceValues.size();i++){
