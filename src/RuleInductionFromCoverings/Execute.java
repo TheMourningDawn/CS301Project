@@ -42,6 +42,11 @@ public class Execute {
 		return null;
 	}
 	
+	// for testing
+	public static <T> boolean isPartition(Set<List<T>> set, Set<List<T>> subset) {
+		return true;
+	}
+	
 	public boolean computeCoverings(Set<List<String>> nonDecPartition,Set<List<String>> decPartition){
 //		boolean isCovering = true;
 		boolean isSubsetOfOne = false;
