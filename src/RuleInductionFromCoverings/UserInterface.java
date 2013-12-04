@@ -4,6 +4,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -140,7 +142,12 @@ public class UserInterface extends JFrame implements ActionListener {
 				logData.setText(logData.getText() + "Opening: " + file.getName() + "\n" );
 				////
 				ReadArffFile inputFileRead = new ReadArffFile(file);
-				inputFileRead.readFile();
+				Execute runAlgorithm = new Execute(inputFileRead.readFile());
+				//Going to try running with some dec attr
+				List<String> decAttr = new ArrayList<String>();
+				decAttr.add("f");
+				runAlgorithm.runOne(decAttr);
+				
 				//Set the controls to enabled so we can start our algorithm!
 				//TODO: Have to actually fill these controls so they can do something
 				setEnabled(true);
