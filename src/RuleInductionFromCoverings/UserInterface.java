@@ -1,3 +1,4 @@
+package RuleInductionFromCoverings;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -50,7 +51,6 @@ public class UserInterface extends JFrame implements ActionListener {
 	public static void main(String[] args) {
 		//Since this is the main, in order to skate around making everything static we just create an instance of this class with default constructor
 		myInterface = new UserInterface();
-
 	}
 
 	public void createMainFrame()

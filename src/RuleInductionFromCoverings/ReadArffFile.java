@@ -1,3 +1,4 @@
+package RuleInductionFromCoverings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -52,6 +53,8 @@ public class ReadArffFile {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Execute thisExecute = new Execute(lotsOData);
+		thisExecute.doSomethingForNow();
 	}
 	
 	//Method for printing out what I've read in.
