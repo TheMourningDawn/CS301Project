@@ -47,17 +47,43 @@ public class Execute {
 		return unique_values;
 	}
 	
-	public Set<List<String>> computePartition(List<String> nonDec,List<String> dec){
-		Set<List<Integer>> combinedNonDec = new HashSet<List<Integer>>();
+	public Set<List<Integer>> computePartition(List<String> attributesByName){
+		Set<List<Integer>> partition = new HashSet<List<Integer>>();
+		//Make a new list of integers to store some hashed strings (could maybe use array instead)
+		List<Integer> hashedAttributes = new ArrayList<Integer>();
+		//Concat (string) values of each nonDec attribute and hash it and put it in a list
 		for(int i=0;i<relation.attributeData.get(0).instanceValues.size();i++){
-			
+			String comboToHash = "";
+			for(int j=0;j<attributesByName.size();j++){
+				//Holy cow
+				comboToHash+= relation.attributeData.get(attributeIndexMap.get(attributesByName.get(j))).instanceValues.get(i);
+			}
+			hashedAttributes.add(comboToHash.hashCode());
 		}
-		return null;
-	}
-	
-	// for testing
-	public static <T> boolean isPartition(Set<List<T>> set, Set<List<T>> subset) {
-		return true;
+		
+		//Need to look through each value in hashedAttributes and get the indexesss
+		System.out.println("hashedAttributes size: " + hashedAttributes.size() + " and values: " + hashedAttributes.toString());
+		//Waste some more space to get the unique values in hashed attributes to find and destroy
+		Object[] uniqueHash = new HashSet<Integer>(hashedAttributes).toArray();
+		for(int i=0;i<uniqueHash.length;i++){ //For each unique value
+			System.out.println("We are on value: " + uniqueHash[i] + " iteration: " + i);
+			List<Integer> singlePartition = new ArrayList<Integer>();
+			for(int j=0;j<hashedAttributes.size();j++){//Find all occurrences in hashedAttributes
+				System.out.println("hashed of " + j + " = " + hashedAttributes.get(j));
+				//If they match, do some stuff
+				//NOTE: Not sure why I have to get the hash code to compare, I think I was checking
+				//object references before, and uniqueHash contains one exact copy 
+				if(hashedAttributes.get(j).hashCode()==uniqueHash[i].hashCode()){
+					System.out.println("It contains, and is at index of: " + j);
+					singlePartition.add(j);	//Add the index number to one *list* or piece of a partition ({x1,x2})
+				}	
+			}
+			partition.add(singlePartition); //Add each list ({x1,x2}) to the partition ( [{x3,x4},...,{x1,x2}] )
+		}
+		for(List<Integer> one:partition){
+			System.out.println(new String(one.toString()));
+		}
+		return partition;
 	}
 	
 	public boolean computeCoverings(Set<List<String>> nonDecPartition,Set<List<String>> decPartition){

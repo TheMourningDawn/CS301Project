@@ -54,7 +54,12 @@ public class ReadArffFile {
 			e.printStackTrace();
 		}
 		Execute thisExecute = new Execute(lotsOData);
-		thisExecute.doSomethingForNow();
+		List<String> testAttrByName = new ArrayList<String>();
+		testAttrByName.add("a0");
+		testAttrByName.add("a1");
+		testAttrByName.add("a2");
+		testAttrByName.add("a3");
+		thisExecute.computePartition(testAttrByName);
 	}
 	
 	//Method for printing out what I've read in.
