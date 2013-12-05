@@ -147,6 +147,7 @@ public class UserInterface extends JFrame implements ActionListener {
 				List<String> decAttr = new ArrayList<String>();
 				decAttr.add("f");
 				runAlgorithm.runOne(decAttr);
+				runAlgorithm.printAllCovering();
 				
 				//Set the controls to enabled so we can start our algorithm!
 				//TODO: Have to actually fill these controls so they can do something

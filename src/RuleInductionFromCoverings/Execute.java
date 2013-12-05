@@ -1,5 +1,6 @@
 package RuleInductionFromCoverings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +10,9 @@ import java.util.Set;
 public class Execute {
 	Relation relation = new Relation();
 	HashMap<String,Integer> attributeIndexMap = new HashMap<String,Integer>();
+	Set<List<String>> allCoverings = new HashSet<List<String>>();
+	Set<List<Integer>> decisionPartition;
+//	Set<String> nonDecisionAttributeSet;
 	
 	//I think we need some way to tell if a partition is minimal for its values...
 	public Execute(Relation relate){
@@ -17,43 +21,66 @@ public class Execute {
 			attributeIndexMap.put(relate.attributeData.get(i).instanceName, i);
 		}
 	}
-	
+	  
 	//Trying some stuff here
 	//This method might turn into caculateAllCoverings...or something to that effect
 	public Set<List<String>> runOne(List<String> decisionAttributes){
-		Set<List<String>> allCoverings = new HashSet<List<String>>();
 		//Get the partition for the decision attributes
-		Set<List<Integer>> decisionPartition;
 		decisionPartition = computePartition(decisionAttributes);
 		
 		//Get the set of non decision attributes to run partitions on
-		Set<String> nonDecisionAttributeSet = new HashSet<String>();
-		for(Attribute oneAttr:relation.attributeData){
-			System.out.println("Looking throughAttr");
-			if(!decisionAttributes.contains(oneAttr.instanceName)){
-				System.out.println("This one was non dec - put in set");
+		List<String> nonDecisionAttributeSet = new ArrayList<String>();
+		for(Attribute oneAttr:relation.attributeData) {
+			if(!decisionAttributes.contains(oneAttr.instanceName)) {
+//				System.out.println("This one was non dec - put in set: " + oneAttr.instanceName);
 				nonDecisionAttributeSet.add(oneAttr.instanceName);
 			}	
 		}
-		//Compute the *power set* of the nonDecision attributes to get all combination
-		//TODO: Need to make the current power set function to return smaller subsets (only 3 or 4 values max rather than the whole power set)
-		Set<Set<String>> attributeCombinations = powerSet(nonDecisionAttributeSet);
-		System.out.println("Just computed power set");
+		
 		//Now iterate through all these combinations and calculate possible partitions --> coverings
-		for(Set<String> oneAttrCombo:attributeCombinations){
-			System.out.println("Checking on oneAttrCombo: " + oneAttrCombo.toString());
-			//Get partition for this combination of non decision attributes
-			List<String> nonDecAsList = new ArrayList<String>(oneAttrCombo);
-			Set<List<Integer>> singlePartition = computePartition(nonDecAsList);
-			//Check to see if it's a possible covering
-			if(isCoveringCanidate(singlePartition, decisionPartition)){
-				System.out.println("Found one that could be a covering!");
-				//TODO: Actually check if its minimal
-				//For now, just put all covering canidates into our structure
-				allCoverings.add(nonDecAsList);
-			}
-		}
+		System.out.println("Checking on size: " + nonDecisionAttributeSet.toString());
+		processSubsets(nonDecisionAttributeSet, 2);
 		return allCoverings;
+	}
+	
+	public void checkIsCovering(List<String> oneAttrCombo){
+//		System.out.println("Checking on size: " + oneAttrCombo.size() + " oneAttrCombo: " + oneAttrCombo.toString());
+		//Get partition for this combination of non decision attributes
+		Set<List<Integer>> singlePartition = computePartition(oneAttrCombo);
+		System.out.println("Partition for:");
+		//Check to see if it's a possible covering
+		if(isCoveringCanidate(singlePartition, decisionPartition)) {
+			System.out.println("Found one that could be a covering!");
+			//TODO: Actually check if its minimal
+			//For now, just put all covering canidates into our structure
+			allCoverings.add(oneAttrCombo);
+		}
+	}
+	
+	public void printAllCovering(){
+		for(List<String> line:allCoverings){
+			System.out.println(line.toString());
+		}
+	}
+	
+	
+	public void processSubsets(List<String> set, int maxSize) {
+		System.out.println("in processSubsets: " + set.size());	
+		List<String> subset = new ArrayList<String>();
+	    processLargerSubsets(set, subset, maxSize, 0, 0);
+	}
+
+	public void processLargerSubsets(List<String> set, List<String> subset, int maxSize, int subsetSize, int nextIndex) {
+		if (subsetSize == maxSize && subset.size() != 0) {
+	    	//The method we want to call on all subsets (check for covering + whatnot)
+	    	checkIsCovering(subset);
+	    } else {
+	    	List<String> subsetList = new ArrayList<String>();
+	        for (int j = nextIndex; j < set.size(); j++) {
+	        	subsetList.add(set.get(j));
+	            processLargerSubsets(set, subsetList, maxSize, subsetSize + 1, j + 1);
+	        }
+	    }
 	}
 	
 	public void doSomethingForNow(){
@@ -174,6 +201,10 @@ public class Execute {
 	    	sets.add(set);
 	    }		
 	    return sets;
+	}
+	
+	public static <T> Set<Set<T>> flyingPowerSet(Set<T> originalSet){
+		return null;
 	}
 	
 	public void runRICO(Set<List<String>> covering){
