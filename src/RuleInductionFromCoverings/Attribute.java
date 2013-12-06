@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 public class Attribute {
-	public String instanceName;
-	public String instanceValueType;
-	public List<String> instanceValues;
+	public String instanceName; // name of this attribute column
+	public String instanceValueType; // e.g. numeric
+	public List<String> instanceValues; // list of all values in this column
 	
 	public Set<String> uniqueValues;
 	

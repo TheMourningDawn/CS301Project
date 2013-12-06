@@ -87,8 +87,8 @@ public class Execute {
 		}
 	}
 	
+	// for debugging, prints out all coverings detected
 	public void printAllCovering(){
-		System.out.println("Here are teh coverings");
 		for(List<String> line:allCoverings){
 //			System.out.println(line.toString());
 		}
@@ -109,6 +109,7 @@ public class Execute {
 		return frequency;
 	}
 	
+	// Compute the partitions for a list of attributes
 	public Set<List<Integer>> computePartition(List<String> attributesByName){
 		Set<List<Integer>> partition = new HashSet<List<Integer>>();
 		//Make a new list of integers to store some hashed strings (could maybe use array instead)
@@ -272,8 +273,10 @@ public class Execute {
 		}
 	}
 	
+	// Gets the number of times value occurs within the attribute column attribute
 	public int checkNumOccurences(String attribute, String value){
 		int sum = 0;
+		// Iterate over each value in the column and sum up the number of times each time it occurs
 		for(int i=0;i<relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.size();i++){
 			if(relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.get(i).equals(value)){
 				sum++;
