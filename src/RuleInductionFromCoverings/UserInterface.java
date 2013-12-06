@@ -41,9 +41,9 @@ public class UserInterface extends JFrame implements ActionListener {
 	
 	JTextField decisionAttrTextBox;
 
-	JComboBox<String> decisionAttrCbo;
-	public JComboBox<String> maxNumAttr;
-	JComboBox<String> minCoverage;
+	JComboBox decisionAttrCbo;
+	public JComboBox maxNumAttr;
+	JComboBox minCoverage;
 
 	JCheckBox dropUnnecessary;
 
@@ -104,21 +104,21 @@ public class UserInterface extends JFrame implements ActionListener {
 		
 		//Create the decision attribute choose 
 		//TODO: Change this so we can use more than one decision attr + sort it somehow
-		decisionAttrCbo = new JComboBox<String>();
+		decisionAttrCbo = new JComboBox();
 		decisionAttrCbo.setPreferredSize(new Dimension(100,25));
 		decisionAttrCbo.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
 		decisionAttrCbo.addActionListener(this);
 //		mainFrame.add(decisionAttrCbo);
 
 		//Create the combo boxes for min coverage for rule to be reported and max num attributes to consider
-		maxNumAttr = new JComboBox<String>();
+		maxNumAttr = new JComboBox();
 		maxNumAttr.setPreferredSize(new Dimension(100,25));
 		maxNumAttr.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
 		maxNumAttr.addActionListener(this);
 		mainFrame.add(maxNumAttrLbl);
 		mainFrame.add(maxNumAttr);
 
-		minCoverage = new JComboBox<String>();
+		minCoverage = new JComboBox();
 		String[] minCoverageOptions = new String[10];
 		for(int i=0;i<minCoverageOptions.length;i++){
 			minCoverageOptions[i]=Integer.toString(i+1);
