@@ -1,7 +1,8 @@
 ﻿To run this application on the cs 213 machines, follow these steps:
 
-
 1. Copy the zip file to a given directory and unzip it
-2. On the command line, run java UserInterface
-3. You will be presented with a GUI asking for a file. Select the file and then select the options for RICO.
-4. Press Run and your output will be displayed in the UI.
+2. On the command line, change directories into src/
+3. To compile, run javac RuleInductionFromCoverings/*.java
+4. Then to run, run java RuleInductionFromCoverings/UserInterface
+5. You will be presented with a GUI asking for a file. Select the file and then select the options for RICO.
+6. Press Run and your output will be displayed in the UI.
