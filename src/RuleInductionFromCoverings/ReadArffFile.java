@@ -17,7 +17,7 @@ public class ReadArffFile {
 	
 	//TODO: Depending on what we decide needs to be done to this data, we might need to read it into different structures
 	public Relation readFile(){
-		UserInterface.logData.setText(UserInterface.logData.getText() + "Starting to read file: " + input.getName());
+//		UserInterface.logData.setText(UserInterface.logData.getText() + "Starting to read file: " + input.getName());
 		
 		BufferedReader reader;
 		String currentLine;

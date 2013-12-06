@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -24,14 +25,20 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class UserInterface extends JFrame implements ActionListener {
 	private static UserInterface myInterface;
+	
+	//Some stuff required to read file and run algorithm!
+	ReadArffFile inputFileRead;
+	Execute runAlgorithm;
 
 	JFrame mainFrame;
 	JButton openFile;
-	JButton runAlgorithm;
+	JButton runAlgorithmBtn;
 
 	JLabel maxNumAttrLbl = new JLabel("Maximum number of attributes to consider:");
 	JLabel minCoverageLbl = new JLabel("Minimum coverage for reporting:");
+	JLabel decisionAttrLbl = new JLabel("Choose attribute(s) to be decision:");
 
+	JComboBox<String> decisionAttrCbo;
 	JComboBox<String> maxNumAttr;
 	JComboBox<String> minCoverage;
 
@@ -79,6 +86,17 @@ public class UserInterface extends JFrame implements ActionListener {
 		dropUnnecessary.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
 		dropUnnecessary.addActionListener(this);
 		mainFrame.add(dropUnnecessary);
+		
+		//Create the label for the decision attributeness
+		mainFrame.add(decisionAttrLbl);
+		
+		//Create the decision attribute choose 
+		//TODO: Change this so we can use more than one decision attr + sort it somehow
+		decisionAttrCbo = new JComboBox<String>();
+		decisionAttrCbo.setPreferredSize(new Dimension(100,25));
+		decisionAttrCbo.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
+		decisionAttrCbo.addActionListener(this);
+		mainFrame.add(decisionAttrCbo);
 
 		//Create the combo boxes for min coverage for rule to be reported and max num attributes to consider
 		maxNumAttr = new JComboBox<String>();
@@ -89,6 +107,12 @@ public class UserInterface extends JFrame implements ActionListener {
 		mainFrame.add(maxNumAttr);
 
 		minCoverage = new JComboBox<String>();
+		String[] minCoverageOptions = new String[10];
+		for(int i=0;i<minCoverageOptions.length;i++){
+			minCoverageOptions[i]=Integer.toString(i+1);
+		}
+		DefaultComboBoxModel model2 = new DefaultComboBoxModel(minCoverageOptions);
+		minCoverage.setModel(model2);
 		minCoverage.setPreferredSize(new Dimension(100,25));
 		minCoverage.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
 		minCoverage.addActionListener(this);
@@ -96,10 +120,11 @@ public class UserInterface extends JFrame implements ActionListener {
 		mainFrame.add(minCoverage);
 
 		//Add the run button
-		runAlgorithm = new JButton("Run!");
-		runAlgorithm.setPreferredSize(new Dimension(200,25));
-		runAlgorithm.setEnabled(false);
-		mainFrame.add(runAlgorithm);
+		runAlgorithmBtn = new JButton("Run!");
+		runAlgorithmBtn.setPreferredSize(new Dimension(200,25));
+		runAlgorithmBtn.setEnabled(false);
+		runAlgorithmBtn.addActionListener(this);
+		mainFrame.add(runAlgorithmBtn);
 
 
 		//Create the text area we will be sending our logs to
@@ -129,7 +154,8 @@ public class UserInterface extends JFrame implements ActionListener {
 		minCoverage.setEnabled(enabled);
 		maxNumAttr.setEnabled(enabled);
 		dropUnnecessary.setEnabled(enabled);
-		runAlgorithm.setEnabled(enabled);
+		runAlgorithmBtn.setEnabled(enabled);
+		decisionAttrCbo.setEnabled(enabled);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -138,16 +164,24 @@ public class UserInterface extends JFrame implements ActionListener {
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = openWekaFile.getSelectedFile();
-				//TODO: This is where a real application would open the file.
 				logData.setText(logData.getText() + "Opening: " + file.getName() + "\n" );
-				////
-				ReadArffFile inputFileRead = new ReadArffFile(file);
-				Execute runAlgorithm = new Execute(inputFileRead.readFile());
-				//Going to try running with some dec attr
-				List<String> decAttr = new ArrayList<String>();
-				decAttr.add("f");
-				runAlgorithm.runOne(decAttr);
-				runAlgorithm.printAllCovering();
+				//Create a file read object
+				inputFileRead = new ReadArffFile(file);
+				//Create an execute object based on the Relation we will get out of the file read
+				runAlgorithm = new Execute(inputFileRead.readFile());
+				
+				//Fill combo box with all attributes to select the decision attr
+				DefaultComboBoxModel decisionAttrModel = new DefaultComboBoxModel(runAlgorithm.attributeIndexMap.keySet().toArray());
+				decisionAttrCbo.setModel(decisionAttrModel);
+				
+				//Fill the max number of attr to use (Up to the max available (minus) decision attributes)
+				String[] maxNumTemp = new String[runAlgorithm.attributeIndexMap.size()];
+				for(int i=0;i<runAlgorithm.attributeIndexMap.size();i++){
+					maxNumTemp[i] = Integer.toString(i+1);
+					System.out.println(i+1);
+				}
+				DefaultComboBoxModel maxNumAttrModel = new DefaultComboBoxModel(maxNumTemp);
+				maxNumAttr.setModel(maxNumAttrModel);
 				
 				//Set the controls to enabled so we can start our algorithm!
 				//TODO: Have to actually fill these controls so they can do something
@@ -156,6 +190,14 @@ public class UserInterface extends JFrame implements ActionListener {
 			} else {
 				logData.setText(logData.getText() + "Open command cancelled by user.\n");
 			}
+		}
+		if (e.getSource() == runAlgorithmBtn){
+			System.out.println("Just pushed run!");
+			//Going to try running with some dec attr
+			List<String> decAttr = new ArrayList<String>();
+			decAttr.add(decisionAttrCbo.getSelectedItem().toString());
+			runAlgorithm.runOne(decAttr);
+			runAlgorithm.printAllCovering();
 		}
 
 	}
