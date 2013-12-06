@@ -29,7 +29,7 @@ public class Execute {
 		decisionPartition = computePartition(decisionAttributes);
 		
 		//Get the set of non decision attributes to run partitions on
-		List<String> nonDecisionAttributeSet = new ArrayList<String>();
+		Set<String> nonDecisionAttributeSet = new HashSet<String>();
 		for(Attribute oneAttr:relation.attributeData) {
 			if(!decisionAttributes.contains(oneAttr.instanceName)) {
 //				System.out.println("This one was non dec - put in set: " + oneAttr.instanceName);
@@ -37,9 +37,14 @@ public class Execute {
 			}	
 		}
 		
+		for(Set one : powerSet(nonDecisionAttributeSet)){
+			List<String> temp = new ArrayList<String>();
+	    	temp.addAll(one);
+	    	checkIsCovering(temp);
+		}
 		//Now iterate through all these combinations and calculate possible partitions --> coverings
 		System.out.println("Checking on size: " + nonDecisionAttributeSet.toString());
-		processSubsets(nonDecisionAttributeSet, 2);
+//		processSubsets(nonDecisionAttributeSet, 2);
 		return allCoverings;
 	}
 	
@@ -53,11 +58,33 @@ public class Execute {
 			System.out.println("Found one that could be a covering!");
 			//TODO: Actually check if its minimal
 			//For now, just put all covering canidates into our structure
-			allCoverings.add(oneAttrCombo);
+			boolean foundLarger = false;
+			boolean isLarger = false;
+			List<String> temp = new ArrayList<String>();
+			for(List<String> one:allCoverings) {
+				if(one.containsAll(oneAttrCombo)) {
+					foundLarger = true;
+					temp = one;
+				} 
+				if(oneAttrCombo.containsAll(one)) {
+					isLarger = true;
+				}
+			}
+			if(foundLarger){
+//				System.out.println("I've found a larger");
+				allCoverings.remove(temp);
+				allCoverings.add(oneAttrCombo);
+			} else if(isLarger) {
+				//Do nothing
+			}
+			else {
+				allCoverings.add(oneAttrCombo);
+			}
 		}
 	}
 	
 	public void printAllCovering(){
+		System.out.println("Here are teh coverings");
 		for(List<String> line:allCoverings){
 			System.out.println(line.toString());
 		}
@@ -80,22 +107,6 @@ public class Execute {
 				subsetList.add(set.get(j));
 				processLargerSubsets(set, subsetList, maxSize, subsetSize + 1, j + 1);
 			}
-		}
-	}
-	
-	public void doSomethingForNow(){
-		//TODO: have to make this only get the non-decision attributes!
-		//Make a set of the attributes
-		Set<String> attributeSet = new HashSet<String>();
-		for(Attribute oneAttr:relation.attributeData){
-			attributeSet.add(oneAttr.instanceName);
-		}
-		
-		
-		//Make the combinations of all values (power set for now, later could/should be smaller)
-		Set<Set<String>> allCombo = powerSet(attributeSet);
-		for(Set<String> s : allCombo){
-			System.out.println(s);
 		}
 	}
 	
@@ -146,9 +157,6 @@ public class Execute {
 			}
 			partition.add(singlePartition); //Add each list ({x1,x2}) to the partition ( [{x3,x4},...,{x1,x2}] )
 		}
-		for(List<Integer> one:partition){
-//			System.out.println(new String(one.toString()));
-		}
 		return partition;
 	}
 	
@@ -180,7 +188,6 @@ public class Execute {
 			}
 		}
 		//If we got here, its a subset, I hope
-		//TODO: We aren't checking for minimalism here, so that must be done at some point
 		return true;
 	}
 	
@@ -222,10 +229,6 @@ public class Execute {
 			ps = newPs;
 		  }
 		  return ps;
-	}
-	
-	public static <T> Set<Set<T>> flyingPowerSet(Set<T> originalSet){
-		return null;
 	}
 	
 	public void runRICO(Set<List<String>> covering){
