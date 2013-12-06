@@ -26,6 +26,17 @@ public class Execute {
 	//Trying some stuff here
 	//This method might turn into caculateAllCoverings...or something to that effect
 	public Set<List<String>> runOne(List<String> decisionAttributes){
+		UserInterface.logData.setText(UserInterface.logData.getText() + "Decision Attributes: " + decisionAttributes + "\n");
+		//Print out our possible values for all decision attributes
+		for(int i=0;i<decisionAttributes.size();i++){
+			UserInterface.logData.setText(UserInterface.logData.getText() + "Distribution of values for attribute " + decisionAttributes.get(i) + "\n");
+			HashMap<String,Integer> possibleValues = getPossibleValuesFor(relation.attributeData.get(attributeIndexMap.get(decisionAttributes.get(i))).instanceValues);
+			for(String key:possibleValues.keySet()){
+				UserInterface.logData.setText(UserInterface.logData.getText() + "Value: " + key + " Occurrences: " + possibleValues.get(key) + "\n");
+			}
+			UserInterface.logData.setText(UserInterface.logData.getText() + "\n");
+		}
+		
 		//Get the partition for the decision attributes
 		decisionPartition = computePartition(decisionAttributes);
 		
@@ -38,13 +49,15 @@ public class Execute {
 			}	
 		}
 		
-		for(Set one : powerSet(nonDecisionAttributeSet)){
+		//Find the subsets of our nonDecision attributes
+		for(Set<String> one : powerSet(nonDecisionAttributeSet)){
 			List<String> temp = new ArrayList<String>();
 	    	temp.addAll(one);
 	    	if(temp.size() != 0){checkIsCovering(temp);}
 		}
+		
 		//Now iterate through all these combinations and calculate possible partitions --> coverings
-		System.out.println("Checking on size: " + nonDecisionAttributeSet.toString());
+//		System.out.println("Checking on size: " + nonDecisionAttributeSet.toString());
 //		processSubsets(nonDecisionAttributeSet, 2);
 		return allCoverings;
 	}
@@ -92,24 +105,24 @@ public class Execute {
 	}
 	
 	
-	public void processSubsets(List<String> set, int maxSize) {
-		System.out.println("in processSubsets: " + set.size());	
-		List<String> subset = new ArrayList<String>();
-		processLargerSubsets(set, subset, maxSize, 0, 0);
-	}
-
-	public void processLargerSubsets(List<String> set, List<String> subset, int maxSize, int subsetSize, int nextIndex) {
-		if (subsetSize == maxSize && subset.size() != 0) {
-			//The method we want to call on all subsets (check for covering + whatnot)
-			checkIsCovering(subset);
-		} else {
-			List<String> subsetList = new ArrayList<String>();
-			for (int j = nextIndex; j < set.size(); j++) {
-				subsetList.add(set.get(j));
-				processLargerSubsets(set, subsetList, maxSize, subsetSize + 1, j + 1);
-			}
-		}
-	}
+//	public void processSubsets(List<String> set, int maxSize) {
+//		System.out.println("in processSubsets: " + set.size());	
+//		List<String> subset = new ArrayList<String>();
+//		processLargerSubsets(set, subset, maxSize, 0, 0);
+//	}
+//
+//	public void processLargerSubsets(List<String> set, List<String> subset, int maxSize, int subsetSize, int nextIndex) {
+//		if (subsetSize == maxSize && subset.size() != 0) {
+//			//The method we want to call on all subsets (check for covering + whatnot)
+//			checkIsCovering(subset);
+//		} else {
+//			List<String> subsetList = new ArrayList<String>();
+//			for (int j = nextIndex; j < set.size(); j++) {
+//				subsetList.add(set.get(j));
+//				processLargerSubsets(set, subsetList, maxSize, subsetSize + 1, j + 1);
+//			}
+//		}
+//	}
 	
 	// Gets all possible values for a given attribute, for output and for ez partitioning
 	public HashMap<String, Integer> getPossibleValuesFor(List<String> attribute_values) {
@@ -118,9 +131,9 @@ public class Execute {
 		for (String value : attribute_values) {
 			//TODO: Sets should only add a value if it's not already in there, so we probably don't have to do this check
 			if (!frequency.containsKey(value)) {
-				frequency.put(value, 0);
+				frequency.put(value, 1);
 			} else {
-				frequency.put(value,  frequency.get(value) + 1);
+				frequency.put(value, frequency.get(value) + 1);
 			}
 		}
 		
@@ -237,10 +250,7 @@ public class Execute {
 	}
 	
 	//TODO pass in the decision attributes as well?
-	public void runRICO(Set<List<String>> covering,int minCoverage){
-		//TEMP!:
-		List<String> decision = new ArrayList<String>();
-		decision.add("f");
+	public void runRICO(Set<List<String>> covering,List<String> decision, int minCoverage){
 		//A hash map to store our results...this seems so unnecessary
 		List<HashMap<List<HashMap<String,String>>,Integer>> results = new ArrayList<HashMap<List<HashMap<String,String>>,Integer>>();
 		
@@ -272,25 +282,28 @@ public class Execute {
 					resultForSingleCovering.put(rules, incCount);
 				}
 			}
+			UserInterface.logData.setText(UserInterface.logData.getText() + "Rules for covering " + oneCovering.toString() + "\n");
 			for(List<HashMap<String, String>> oneResult:resultForSingleCovering.keySet()){//Something happens around here if the min coverage is higher than the highest covering
 				//Only return results that are >= our minCoverage
 				if(resultForSingleCovering.get(oneResult) < minCoverage){
 					resultForSingleCovering.remove(oneResult);
+				} else {
+					UserInterface.logData.setText(UserInterface.logData.getText() + "[" + oneResult.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
 				}
 				//Here we want to prune!
 				for(HashMap<String, String> mapOneResult:oneResult){
 //					if(mapOneResult.)
 				}
-				
 			}
+			UserInterface.logData.setText(UserInterface.logData.getText() + "\n\n");
 			results.add(resultForSingleCovering);
 		}
-		for(HashMap<List<HashMap<String, String>>, Integer> oneHash:results){
-			System.out.println("New covering");
-			for(List<HashMap<String, String>> oneThingy:oneHash.keySet()){
-				System.out.println(oneThingy.toString() + ", " + oneHash.get(oneThingy));
-			}
-		}
+//		for(HashMap<List<HashMap<String, String>>, Integer> oneHash:results){
+//			System.out.println("New covering");
+//			for(List<HashMap<String, String>> oneThingy:oneHash.keySet()){
+//				System.out.println(oneThingy.toString() + ", " + oneHash.get(oneThingy));
+//			}
+//		}
 	}
 	
 	public int checkNumOccurences(String value){

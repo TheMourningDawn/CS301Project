@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -15,6 +16,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -36,7 +38,9 @@ public class UserInterface extends JFrame implements ActionListener {
 
 	JLabel maxNumAttrLbl = new JLabel("Maximum number of attributes to consider:");
 	JLabel minCoverageLbl = new JLabel("Minimum coverage for reporting:");
-	JLabel decisionAttrLbl = new JLabel("Choose attribute(s) to be decision:");
+	JLabel decisionAttrLbl = new JLabel("Choose attribute(s) to be decision (eg f,g):");
+	
+	JTextField decisionAttrTextBox;
 
 	JComboBox<String> decisionAttrCbo;
 	JComboBox<String> maxNumAttr;
@@ -90,13 +94,22 @@ public class UserInterface extends JFrame implements ActionListener {
 		//Create the label for the decision attributeness
 		mainFrame.add(decisionAttrLbl);
 		
+		//Different decision attr choose, text box so we can have more than one
+		//Couldn't really get an enumerated list very well here with the GUI
+		decisionAttrTextBox = new JTextField();
+		decisionAttrTextBox.setPreferredSize(new Dimension(100,25));
+		decisionAttrTextBox.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
+		decisionAttrTextBox.addActionListener(this);
+		mainFrame.add(decisionAttrTextBox);
+		
+		
 		//Create the decision attribute choose 
 		//TODO: Change this so we can use more than one decision attr + sort it somehow
 		decisionAttrCbo = new JComboBox<String>();
 		decisionAttrCbo.setPreferredSize(new Dimension(100,25));
 		decisionAttrCbo.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
 		decisionAttrCbo.addActionListener(this);
-		mainFrame.add(decisionAttrCbo);
+//		mainFrame.add(decisionAttrCbo);
 
 		//Create the combo boxes for min coverage for rule to be reported and max num attributes to consider
 		maxNumAttr = new JComboBox<String>();
@@ -155,7 +168,8 @@ public class UserInterface extends JFrame implements ActionListener {
 		maxNumAttr.setEnabled(enabled);
 		dropUnnecessary.setEnabled(enabled);
 		runAlgorithmBtn.setEnabled(enabled);
-		decisionAttrCbo.setEnabled(enabled);
+//		decisionAttrCbo.setEnabled(enabled);
+		decisionAttrTextBox.setEnabled(enabled);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -164,7 +178,7 @@ public class UserInterface extends JFrame implements ActionListener {
 
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = openWekaFile.getSelectedFile();
-				logData.setText(logData.getText() + "Opening: " + file.getName() + "\n" );
+				logData.setText(logData.getText() + "Opening: " + file.getName() + "\n\n" );
 				//Create a file read object
 				inputFileRead = new ReadArffFile(file);
 				//Create an execute object based on the Relation we will get out of the file read
@@ -186,7 +200,8 @@ public class UserInterface extends JFrame implements ActionListener {
 				//Set the controls to enabled so we can start our algorithm!
 				//TODO: Have to actually fill these controls so they can do something
 				setEnabled(true);
-				inputFileRead.printRelation();
+//				inputFileRead.printRelation();
+				inputFileRead.printRelationToLog();
 			} else {
 				logData.setText(logData.getText() + "Open command cancelled by user.\n");
 			}
@@ -194,11 +209,16 @@ public class UserInterface extends JFrame implements ActionListener {
 		if (e.getSource() == runAlgorithmBtn){
 			System.out.println("Just pushed run!");
 			//Going to try running with some dec attr
-			List<String> decAttr = new ArrayList<String>();
-			decAttr.add(decisionAttrCbo.getSelectedItem().toString());
-			runAlgorithm.runOne(decAttr);
-			runAlgorithm.printAllCovering();
-			runAlgorithm.runRICO(runAlgorithm.allCoverings,Integer.parseInt(minCoverage.getSelectedItem().toString()));
+			if(!decisionAttrTextBox.getText().equals("")){
+				List<String> decAttr = Arrays.asList(decisionAttrTextBox.getText().split(","));
+//				decAttr.add(decisionAttrCbo.getSelectedItem().toString());
+				runAlgorithm.runOne(decAttr);
+				runAlgorithm.printAllCovering();
+				runAlgorithm.runRICO(runAlgorithm.allCoverings,decAttr,Integer.parseInt(minCoverage.getSelectedItem().toString()));
+			} else {
+				logData.setText(logData.getText()+ "Please select your covering attributes!\n\n");
+			}
+			
 		}
 
 	}
