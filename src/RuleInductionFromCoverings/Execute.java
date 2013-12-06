@@ -1,6 +1,7 @@
 package RuleInductionFromCoverings;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -220,51 +221,55 @@ public class Execute {
 			}
 			//Print more data to the GUI for the user
 			UserInterface.logData.setText(UserInterface.logData.getText() + "Rules for covering " + oneCovering.toString() + "\n");
-			for(List<HashMap<String, String>> oneResult:resultForSingleCovering.keySet()){//Something happens around here if the min coverage is higher than the highest covering
-				if(dropConditions){
-
-					//Here we want to prune!
-					//This is gross. It can't be good.
-					List<String> goodGuys = new ArrayList<String>();
-					for(HashMap<String, String> mapOneResult:oneResult){
-						for(String key:mapOneResult.keySet()){ //Should only be 1 in each of these
-							if( !decision.contains(key) && checkNumOccurences(key,mapOneResult.get(key)) == resultForSingleCovering.get(oneResult)){
-								goodGuys.add(key);
+			try {
+				for(List<HashMap<String, String>> oneResult:resultForSingleCovering.keySet()){//Something happens around here if the min coverage is higher than the highest covering
+					if(dropConditions){
+	
+						//Here we want to prune!
+						//This is gross. It can't be good.
+						List<String> goodGuys = new ArrayList<String>();
+						for(HashMap<String, String> mapOneResult:oneResult){
+							for(String key:mapOneResult.keySet()){ //Should only be 1 in each of these
+								if( !decision.contains(key) && checkNumOccurences(key,mapOneResult.get(key)) == resultForSingleCovering.get(oneResult)){
+									goodGuys.add(key);
+								}
 							}
 						}
-					}
-					List<HashMap<String,String>> tempForPrint = new ArrayList<HashMap<String,String>>();
-					for(HashMap<String,String> tired:oneResult){
-						System.out.println("Trying: " + tired);
-						tempForPrint.add((HashMap<String,String>)tired.clone());
-					}
-					boolean foundOne = false;
-					for(HashMap<String,String> mapOneResult:oneResult){
-						for(String key:mapOneResult.keySet()){
-							if(!foundOne && !goodGuys.contains(key) && !decision.contains(key)){
-								System.out.println("Jack just got replaced!");
-								tempForPrint.get(oneResult.indexOf(mapOneResult)).put(key, "_");
-								foundOne = true;
-							}
-						}	
-					}
-
-					//Only return results that are >= our minCoverage
-					System.out.println("Was failing: " + resultForSingleCovering.get(oneResult) + " " + minCoverage);
-					if(resultForSingleCovering.get(oneResult) < minCoverage){
-						resultForSingleCovering.remove(oneResult);
+						List<HashMap<String,String>> tempForPrint = new ArrayList<HashMap<String,String>>();
+						for(HashMap<String,String> tired:oneResult){
+							System.out.println("Trying: " + tired);
+							tempForPrint.add((HashMap<String,String>)tired.clone());
+						}
+						boolean foundOne = false;
+						for(HashMap<String,String> mapOneResult:oneResult){
+							for(String key:mapOneResult.keySet()){
+								if(!foundOne && !goodGuys.contains(key) && !decision.contains(key)){
+									System.out.println("Jack just got replaced!");
+									tempForPrint.get(oneResult.indexOf(mapOneResult)).put(key, "_");
+									foundOne = true;
+								}
+							}	
+						}
+	
+						//Only return results that are >= our minCoverage
+						System.out.println("Was failing: " + resultForSingleCovering.get(oneResult) + " " + minCoverage);
+						if(resultForSingleCovering.get(oneResult) < minCoverage){
+							resultForSingleCovering.remove(oneResult);
+						} else {
+							UserInterface.logData.setText(UserInterface.logData.getText() + "[" + tempForPrint.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
+						}
 					} else {
-						UserInterface.logData.setText(UserInterface.logData.getText() + "[" + tempForPrint.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
-					}
-				} else {
-					//Only return results that are >= our minCoverage
-					System.out.println("Was failing: " + resultForSingleCovering.get(oneResult) + " " + minCoverage);
-					if(resultForSingleCovering.get(oneResult) < minCoverage){
-						resultForSingleCovering.remove(oneResult);
-					} else {
-						UserInterface.logData.setText(UserInterface.logData.getText() + "[" + oneResult.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
+						//Only return results that are >= our minCoverage
+						System.out.println("Was failing: " + resultForSingleCovering.get(oneResult) + " " + minCoverage);
+						if(resultForSingleCovering.get(oneResult) < minCoverage){
+							resultForSingleCovering.remove(oneResult);
+						} else {
+							UserInterface.logData.setText(UserInterface.logData.getText() + "[" + oneResult.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
+						}
 					}
 				}
+			} catch (ConcurrentModificationException ex) {
+				// Do nothing but fail gracefully
 			}
 			
 			UserInterface.logData.setText(UserInterface.logData.getText() + "\n\n");
