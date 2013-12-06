@@ -40,7 +40,7 @@ public class Execute {
 		for(Set one : powerSet(nonDecisionAttributeSet)){
 			List<String> temp = new ArrayList<String>();
 	    	temp.addAll(one);
-	    	checkIsCovering(temp);
+	    	if(temp.size() != 0){checkIsCovering(temp);}
 		}
 		//Now iterate through all these combinations and calculate possible partitions --> coverings
 		System.out.println("Checking on size: " + nonDecisionAttributeSet.toString());
@@ -52,7 +52,7 @@ public class Execute {
 //		System.out.println("Checking on size: " + oneAttrCombo.size() + " oneAttrCombo: " + oneAttrCombo.toString());
 		//Get partition for this combination of non decision attributes
 		Set<List<Integer>> singlePartition = computePartition(oneAttrCombo);
-		System.out.println("Partition for:");
+		System.out.println("Partition for:" + oneAttrCombo + " partition: " + singlePartition.toString());
 		//Check to see if it's a possible covering
 		if(isCoveringCanidate(singlePartition, decisionPartition)) {
 			System.out.println("Found one that could be a covering!");
@@ -171,9 +171,11 @@ public class Execute {
 	 *		This will be done where we start computing covering candidates.
 	 */
 	public boolean isCoveringCanidate(Set<List<Integer>> nonDecPartition,Set<List<Integer>> decPartition){
-		boolean isSubsetOfOne = false;
+		System.out.println(nonDecPartition + " what: " + decPartition);
+		
 		//For each partition part({x1,x2}...{x7,x8,x9}) of our non decision
 		for(List<Integer> partition:nonDecPartition) {
+			boolean isSubsetOfOne = false;
 			//Look to see if it can be a subset of any partition part of the decision partition
 			for(List<Integer> decPart:decPartition) {
 				//If it is a subset of any of them, set check true and break to next non decision
