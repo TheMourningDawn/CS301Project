@@ -233,7 +233,70 @@ public class Execute {
 		  return ps;
 	}
 	
-	public void runRICO(Set<List<String>> covering){
+	//TODO pass in the decision attributes as well?
+	public void runRICO(Set<List<String>> covering,int minCoverage){
+		//TEMP!:
+		List<String> decision = new ArrayList<String>();
+		decision.add("f");
+		//A hash map to store our results...this seems so unnecessary
+		List<HashMap<List<HashMap<String,String>>,Integer>> results = new ArrayList<HashMap<List<HashMap<String,String>>,Integer>>();
 		
+		for(List<String> oneCovering:covering){
+			//Initialize E to the set of all instances (For us, our original data)
+			List<Attribute> E = relation.attributeData;
+			//Make something to hold a single Hash of values and counts
+			HashMap<List<HashMap<String,String>>,Integer> resultForSingleCovering = new HashMap<List<HashMap<String,String>>,Integer>();
+			for(int i=0;i<E.get(0).instanceValues.size();i++){
+				List<HashMap<String,String>> rules = new ArrayList<HashMap<String,String>>();
+				for(int j=0;j<oneCovering.size();j++){
+//					System.out.println("i: " + i + " j: " + j);
+					HashMap<String,String> rulePair = new HashMap<String,String>();
+					rulePair.put(oneCovering.get(j), E.get(attributeIndexMap.get(oneCovering.get(j))).instanceValues.get(i));
+					rules.add(rulePair);
+					//E.get(attributeIndexMap.get(oneCovering.get(j))).instanceValues.remove(i);
+				}
+				//Put in the decision as the last one
+				for(int j=0;j<decision.size();j++){
+					HashMap<String,String> rulePair = new HashMap<String,String>();
+					rulePair.put(decision.get(j), E.get(attributeIndexMap.get(decision.get(j))).instanceValues.get(i));
+					rules.add(rulePair);
+//					rules.add(E.get(attributeIndexMap.get(decision.get(j))).instanceValues.get(i));
+				}
+				if(!resultForSingleCovering.containsKey(rules)){
+					resultForSingleCovering.put(rules,1);
+				} else {
+					int incCount = (resultForSingleCovering.get(rules)+1);
+					resultForSingleCovering.put(rules, incCount);
+				}
+			}
+			for(List<HashMap<String, String>> oneResult:resultForSingleCovering.keySet()){//Something happens around here if the min coverage is higher than the highest covering
+				//Only return results that are >= our minCoverage
+				if(resultForSingleCovering.get(oneResult) < minCoverage){
+					resultForSingleCovering.remove(oneResult);
+				}
+				//Here we want to prune!
+				for(HashMap<String, String> mapOneResult:oneResult){
+//					if(mapOneResult.)
+				}
+				
+			}
+			results.add(resultForSingleCovering);
+		}
+		for(HashMap<List<HashMap<String, String>>, Integer> oneHash:results){
+			System.out.println("New covering");
+			for(List<HashMap<String, String>> oneThingy:oneHash.keySet()){
+				System.out.println(oneThingy.toString() + ", " + oneHash.get(oneThingy));
+			}
+		}
+	}
+	
+	public int checkNumOccurences(String value){
+		int sum = 0;
+		for(int i=0;i<relation.attributeData.get(0).instanceValues.size();i++){
+			if(relation.attributeData.get(attributeIndexMap.get(value)).instanceValues.get(i).equals(value)){
+				sum++;
+			}
+		}
+		return sum;
 	}
 }

@@ -198,6 +198,7 @@ public class UserInterface extends JFrame implements ActionListener {
 			decAttr.add(decisionAttrCbo.getSelectedItem().toString());
 			runAlgorithm.runOne(decAttr);
 			runAlgorithm.printAllCovering();
+			runAlgorithm.runRICO(runAlgorithm.allCoverings,Integer.parseInt(minCoverage.getSelectedItem().toString()));
 		}
 
 	}
