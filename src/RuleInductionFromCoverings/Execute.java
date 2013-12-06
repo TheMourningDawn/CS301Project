@@ -13,7 +13,6 @@ public class Execute {
 	Set<List<String>> allCoverings = new HashSet<List<String>>();
 	Set<List<Integer>> decisionPartition;
 	
-	//I think we need some way to tell if a partition is minimal for its values...
 	public Execute(Relation relate){
 		relation = relate;
 		for(int i=0;i<relate.attributeData.size();i++){
@@ -26,18 +25,6 @@ public class Execute {
 		UserInterface.logData.setText(UserInterface.logData.getText() + "Decision Attributes: " + decisionAttributes + "\n");
 		//Print out our possible values for all decision attributes to the GUI
 		
-		//Wanted to get ALL combos...cus that's what we need.
-//		Set<Set<String>> allDecCombos = powerSet(new HashSet<String>(decisionAttributes));
-//		for(Set<String> oneDecCombo:allDecCombos){
-//			List<String> oneDecToList = new ArrayList<String>();
-//			oneDecToList.addAll(oneDecCombo);
-//			UserInterface.logData.setText(UserInterface.logData.getText() + "Distribution of values for attribute " + oneDecToList + "\n");
-//			HashMap<String,Integer> possibleValues = getPossibleValuesFor(relation.attributeData.get(attributeIndexMap.get(decisionAttributes.get(i))).instanceValues);
-//			for(String key:possibleValues.keySet()){
-//				UserInterface.logData.setText(UserInterface.logData.getText() + "Value: " + key + " Occurrences: " + possibleValues.get(key) + "\n");
-//			}
-//			UserInterface.logData.setText(UserInterface.logData.getText() + "\n");
-//		}
 		for(int i=0;i<decisionAttributes.size();i++){
 			UserInterface.logData.setText(UserInterface.logData.getText() + "Distribution of values for attribute " + decisionAttributes.get(i) + "\n");
 			HashMap<String,Integer> possibleValues = getPossibleValuesFor(relation.attributeData.get(attributeIndexMap.get(decisionAttributes.get(i))).instanceValues);
@@ -62,22 +49,19 @@ public class Execute {
 		//Now iterate through all these combinations and calculate possible partitions --> coverings
 		for(Set<String> one : powerSet(nonDecisionAttributeSet)){
 			List<String> temp = new ArrayList<String>();
-	    	temp.addAll(one);
-	    	//Only check if it is not empty and does not exceed the max to consider
-	    	if(temp.size() != 0 && temp.size() <= maxNumAttrToConsider){checkIsCovering(temp);}
+			temp.addAll(one);
+			//Only check if it is not empty and does not exceed the max to consider
+			if(temp.size() != 0 && temp.size() <= maxNumAttrToConsider){checkIsCovering(temp);}
 		}
 		return allCoverings;
 	}
 	
 	public void checkIsCovering(List<String> oneAttrCombo){
-//		System.out.println("Checking on size: " + oneAttrCombo.size() + " oneAttrCombo: " + oneAttrCombo.toString());
 		//Get partition for this combination of non decision attributes
 		Set<List<Integer>> singlePartition = computePartition(oneAttrCombo);
-//		System.out.println("Partition for:" + oneAttrCombo + " partition: " + singlePartition.toString());
 		//Check to see if it's a possible covering
 		if(isCoveringCanidate(singlePartition, decisionPartition)) {
 			System.out.println("Found one that could be a covering!");
-			//TODO: Actually check if its minimal
 			//For now, just put all covering canidates into our structure
 			boolean foundLarger = false;
 			boolean isLarger = false;
@@ -110,32 +94,11 @@ public class Execute {
 		}
 	}
 	
-	
-//	public void processSubsets(List<String> set, int maxSize) {
-//		System.out.println("in processSubsets: " + set.size());	
-//		List<String> subset = new ArrayList<String>();
-//		processLargerSubsets(set, subset, maxSize, 0, 0);
-//	}
-//
-//	public void processLargerSubsets(List<String> set, List<String> subset, int maxSize, int subsetSize, int nextIndex) {
-//		if (subsetSize == maxSize && subset.size() != 0) {
-//			//The method we want to call on all subsets (check for covering + whatnot)
-//			checkIsCovering(subset);
-//		} else {
-//			List<String> subsetList = new ArrayList<String>();
-//			for (int j = nextIndex; j < set.size(); j++) {
-//				subsetList.add(set.get(j));
-//				processLargerSubsets(set, subsetList, maxSize, subsetSize + 1, j + 1);
-//			}
-//		}
-//	}
-	
 	// Gets all possible values for a given attribute, for output and for ez partitioning
 	public HashMap<String, Integer> getPossibleValuesFor(List<String> attribute_values) {
 		HashMap<String, Integer> frequency = new HashMap<String, Integer>();
 		
 		for (String value : attribute_values) {
-			//TODO: Sets should only add a value if it's not already in there, so we probably don't have to do this check
 			if (!frequency.containsKey(value)) {
 				frequency.put(value, 1);
 			} else {
@@ -161,19 +124,12 @@ public class Execute {
 		}
 		
 		//Need to look through each value in hashedAttributes and get the indexesss
-//		System.out.println("hashedAttributes size: " + hashedAttributes.size() + " and values: " + hashedAttributes.toString());
-		//Waste some more space to get the unique values in hashed attributes to find and destroy
 		Object[] uniqueHash = new HashSet<Integer>(hashedAttributes).toArray();
 		for(int i=0;i<uniqueHash.length;i++){ //For each unique value
-//			System.out.println("We are on value: " + uniqueHash[i] + " iteration: " + i);
 			List<Integer> singlePartition = new ArrayList<Integer>();
 			for(int j=0;j<hashedAttributes.size();j++){//Find all occurrences in hashedAttributes
-//				System.out.println("hashed of " + j + " = " + hashedAttributes.get(j));
 				//If they match, do some stuff
-				//NOTE: Not sure why I have to get the hash code to compare, I think I was checking
-				//object references before, and uniqueHash contains one exact copy 
 				if(hashedAttributes.get(j).hashCode()==uniqueHash[i].hashCode()){
-//					System.out.println("It contains, and is at index of: " + j);
 					singlePartition.add(j);	//Add the index number to one *list* or piece of a partition ({x1,x2})
 				}	
 			}
@@ -185,10 +141,7 @@ public class Execute {
 	/*
 	 * Here we are checking:
 	 *  1) If P is a subset of S (if our nonDecPartition is a subset of non decision attributes)
-	 *  **Technically** we aren't actually check that...we assume our input will only be those...so g2g
 	 * 	2) If P* <= R* (That all elements of nonDecPartition is a subset of at least one element of decPartition
-	 * 
-	 * We are NOT checking
 	 * 	3) P is minimal
 	 *		This will be done where we start computing covering candidates.
 	 */
@@ -274,7 +227,6 @@ public class Execute {
 					List<String> goodGuys = new ArrayList<String>();
 					for(HashMap<String, String> mapOneResult:oneResult){
 						for(String key:mapOneResult.keySet()){ //Should only be 1 in each of these
-							//						System.out.println("3with this: " + checkNumOccurences(key,mapOneResult.get(key)) + " and " + resultForSingleCovering.get(oneResult));
 							if( !decision.contains(key) && checkNumOccurences(key,mapOneResult.get(key)) == resultForSingleCovering.get(oneResult)){
 								goodGuys.add(key);
 							}
@@ -321,15 +273,12 @@ public class Execute {
 	}
 	
 	public int checkNumOccurences(String attribute, String value){
-//		System.out.println("Value: " + value);
 		int sum = 0;
 		for(int i=0;i<relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.size();i++){
-//			System.out.println("HereONCE: " + relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.get(i));
 			if(relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.get(i).equals(value)){
 				sum++;
 			}
 		}
-//		System.out.println(sum);
 		return sum;
 	}
 }

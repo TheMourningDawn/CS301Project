@@ -8,6 +8,5 @@ public class Relation {
 	public List<Attribute> attributeData = new ArrayList<Attribute>();
 
 	public Relation() {
-		// TODO Auto-generated constructor stub
 	}
 }

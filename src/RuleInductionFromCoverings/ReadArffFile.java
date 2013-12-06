@@ -8,16 +8,14 @@ import java.util.List;
 
 public class ReadArffFile {
 	File input;
-	Relation storedRelation = new Relation(); //TODO:rename me...
+	Relation storedRelation = new Relation();
 
 	public ReadArffFile(File bestInput) {
 		this.input = bestInput;
 	}
 	
-	
-	//TODO: Depending on what we decide needs to be done to this data, we might need to read it into different structures
+	//Depending on what we decide needs to be done to this data, we might need to read it into different structures
 	public Relation readFile(){
-//		UserInterface.logData.setText(UserInterface.logData.getText() + "Starting to read file: " + input.getName());
 		
 		BufferedReader reader;
 		String currentLine;
@@ -46,33 +44,29 @@ public class ReadArffFile {
 			}
 			
 			//Now find the unique values since we have read in all the data
-			//TODO: Not sure we need this at all. Keeping for now.
-//			for(int i=0;i<lotsOData.attributeData.size();i++){
-//				lotsOData.attributeData.get(i).getUniqueValues();
-//			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return storedRelation;
 	}
-	
-	//Method for printing out what I've read in.
-//	public void printRelation(){
-//		System.out.println("Relation name: " + storedRelation.relationName + "\n");
-//		String attrName = "   ";
-//		for(int j=0;j<storedRelation.attributeData.size();j++){
-//			attrName += " " + storedRelation.attributeData.get(j).instanceName;
-//		}
-//		System.out.println(attrName);
-//		for(int i=0;i<storedRelation.attributeData.get(0).instanceValues.size();i++){
-//			String oneLine = "x" + i + ":";
-//			for(int j=0;j<storedRelation.attributeData.size();j++){
-//				oneLine += " " + storedRelation.attributeData.get(j).instanceValues.get(i);
-//			}
-//			System.out.println(oneLine);
-//		}
-//	}
+
+	//Method for printing out what I've read in, for debugging
+	public void printRelation(){
+		System.out.println("Relation name: " + storedRelation.relationName + "\n");
+		String attrName = "   ";
+		for(int j=0;j<storedRelation.attributeData.size();j++){
+			attrName += " " + storedRelation.attributeData.get(j).instanceName;
+		}
+		System.out.println(attrName);
+		for(int i=0;i<storedRelation.attributeData.get(0).instanceValues.size();i++){
+			String oneLine = "x" + i + ":";
+			for(int j=0;j<storedRelation.attributeData.size();j++){
+				oneLine += " " + storedRelation.attributeData.get(j).instanceValues.get(i);
+			}
+			System.out.println(oneLine);
+		}
+	}
+
 	public void printRelationToLog(){
 		UserInterface.logData.setText(UserInterface.logData.getText() + "Relation name: " + storedRelation.relationName + "\n\n");
 		//Uncomment me to print data to the log

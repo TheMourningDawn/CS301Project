@@ -52,14 +52,4 @@ public class understandingDataMining {
 //		assertTrue(Execute.isPartition(partitionA, partitionB));
 	}
 	
-	@Test
-	public void testIsMinimal() {
-		
-	}
-	
-	@Test
-	public void testIsCovering() {
-		
-	}
-	
 }

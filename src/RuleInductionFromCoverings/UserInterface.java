@@ -200,7 +200,6 @@ public class UserInterface extends JFrame implements ActionListener {
 				maxNumAttr.setSelectedIndex(1);
 				
 				//Set the controls to enabled so we can start our algorithm!
-				//TODO: Have to actually fill these controls so they can do something
 				setEnabled(true);
 //				inputFileRead.printRelation();
 				inputFileRead.printRelationToLog();
@@ -213,7 +212,6 @@ public class UserInterface extends JFrame implements ActionListener {
 			//Going to try running with some dec attr
 			if(!decisionAttrTextBox.getText().equals("")){
 				List<String> decAttr = Arrays.asList(decisionAttrTextBox.getText().split(","));
-//				decAttr.add(decisionAttrCbo.getSelectedItem().toString());
 				runAlgorithm.runOne(decAttr,Integer.parseInt(maxNumAttr.getSelectedItem().toString()));
 				runAlgorithm.printAllCovering();
 				runAlgorithm.runRICO(runAlgorithm.allCoverings,decAttr,Integer.parseInt(minCoverage.getSelectedItem().toString()),dropUnnecessary.isSelected());
