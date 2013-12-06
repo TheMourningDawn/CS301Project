@@ -67,20 +67,20 @@ public class Execute {
 	public void processSubsets(List<String> set, int maxSize) {
 		System.out.println("in processSubsets: " + set.size());	
 		List<String> subset = new ArrayList<String>();
-	    processLargerSubsets(set, subset, maxSize, 0, 0);
+		processLargerSubsets(set, subset, maxSize, 0, 0);
 	}
 
 	public void processLargerSubsets(List<String> set, List<String> subset, int maxSize, int subsetSize, int nextIndex) {
 		if (subsetSize == maxSize && subset.size() != 0) {
-	    	//The method we want to call on all subsets (check for covering + whatnot)
-	    	checkIsCovering(subset);
-	    } else {
-	    	List<String> subsetList = new ArrayList<String>();
-	        for (int j = nextIndex; j < set.size(); j++) {
-	        	subsetList.add(set.get(j));
-	            processLargerSubsets(set, subsetList, maxSize, subsetSize + 1, j + 1);
-	        }
-	    }
+			//The method we want to call on all subsets (check for covering + whatnot)
+			checkIsCovering(subset);
+		} else {
+			List<String> subsetList = new ArrayList<String>();
+			for (int j = nextIndex; j < set.size(); j++) {
+				subsetList.add(set.get(j));
+				processLargerSubsets(set, subsetList, maxSize, subsetSize + 1, j + 1);
+			}
+		}
 	}
 	
 	public void doSomethingForNow(){
@@ -184,23 +184,44 @@ public class Execute {
 		return true;
 	}
 	
+	/*
 	public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
-	    Set<Set<T>> sets = new HashSet<Set<T>>();
-	    if (originalSet.isEmpty()) {
-	    	sets.add(new HashSet<T>());
-	    	return sets;
-	    }
-	    List<T> list = new ArrayList<T>(originalSet);
-	    T head = list.get(0);
-	    Set<T> rest = new HashSet<T>(list.subList(1, list.size())); 
-	    for (Set<T> set : powerSet(rest)) {
-	    	Set<T> newSet = new HashSet<T>();
-	    	newSet.add(head);
-	    	newSet.addAll(set);
-	    	sets.add(newSet);
-	    	sets.add(set);
-	    }		
-	    return sets;
+		Set<Set<T>> sets = new HashSet<Set<T>>();
+		if (originalSet.isEmpty()) {
+			sets.add(new HashSet<T>());
+			return sets;
+		}
+		List<T> list = new ArrayList<T>(originalSet);
+		T head = list.get(0);
+		Set<T> rest = new HashSet<T>(list.subList(1, list.size())); 
+		for (Set<T> set : powerSet(rest)) {
+			Set<T> newSet = new HashSet<T>();
+			newSet.add(head);
+			newSet.addAll(set);
+			sets.add(newSet);
+			sets.add(set);
+		}		
+		return sets;
+	}
+	*/
+	
+	public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
+		Set<Set<T>> ps = new HashSet<Set<T>>();
+		ps.add(new HashSet<T>());
+		for (T item : originalSet) {
+			Set<Set<T>> newPs = new HashSet<Set<T>>();
+		 
+			for (Set<T> subset : ps) {
+				newPs.add(subset);
+		 
+				Set<T> newSubset = new HashSet<T>(subset);
+				newSubset.add(item);
+				newPs.add(newSubset);
+			}
+
+			ps = newPs;
+		  }
+		  return ps;
 	}
 	
 	public static <T> Set<Set<T>> flyingPowerSet(Set<T> originalSet){
