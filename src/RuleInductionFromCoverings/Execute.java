@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -111,17 +112,19 @@ public class Execute {
 	}
 	
 	// Gets all possible values for a given attribute, for output and for ez partitioning
-	public Set<String> getPossibleValuesFor(List<String> attribute_values) {
-		Set<String> unique_values = new HashSet<String>();
+	public HashMap<String, Integer> getPossibleValuesFor(List<String> attribute_values) {
+		HashMap<String, Integer> frequency = new HashMap<String, Integer>();
 		
 		for (String value : attribute_values) {
 			//TODO: Sets should only add a value if it's not already in there, so we probably don't have to do this check
-			if (!unique_values.contains(value)) {
-				unique_values.add(value);
+			if (!frequency.containsKey(value)) {
+				frequency.put(value, 0);
+			} else {
+				frequency.put(value,  frequency.get(value) + 1);
 			}
 		}
 		
-		return unique_values;
+		return frequency;
 	}
 	
 	public Set<List<Integer>> computePartition(List<String> attributesByName){
