@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -13,7 +12,6 @@ public class Execute {
 	HashMap<String,Integer> attributeIndexMap = new HashMap<String,Integer>();
 	Set<List<String>> allCoverings = new HashSet<List<String>>();
 	Set<List<Integer>> decisionPartition;
-//	Set<String> nonDecisionAttributeSet;
 	
 	//I think we need some way to tell if a partition is minimal for its values...
 	public Execute(Relation relate){
@@ -23,11 +21,23 @@ public class Execute {
 		}
 	}
 	  
-	//Trying some stuff here
-	//This method might turn into caculateAllCoverings...or something to that effect
 	public Set<List<String>> runOne(List<String> decisionAttributes, int maxNumAttrToConsider){
+		//Print to the GUI the needed info from this section
 		UserInterface.logData.setText(UserInterface.logData.getText() + "Decision Attributes: " + decisionAttributes + "\n");
-		//Print out our possible values for all decision attributes
+		//Print out our possible values for all decision attributes to the GUI
+		
+		//Wanted to get ALL combos...cus that's what we need.
+//		Set<Set<String>> allDecCombos = powerSet(new HashSet<String>(decisionAttributes));
+//		for(Set<String> oneDecCombo:allDecCombos){
+//			List<String> oneDecToList = new ArrayList<String>();
+//			oneDecToList.addAll(oneDecCombo);
+//			UserInterface.logData.setText(UserInterface.logData.getText() + "Distribution of values for attribute " + oneDecToList + "\n");
+//			HashMap<String,Integer> possibleValues = getPossibleValuesFor(relation.attributeData.get(attributeIndexMap.get(decisionAttributes.get(i))).instanceValues);
+//			for(String key:possibleValues.keySet()){
+//				UserInterface.logData.setText(UserInterface.logData.getText() + "Value: " + key + " Occurrences: " + possibleValues.get(key) + "\n");
+//			}
+//			UserInterface.logData.setText(UserInterface.logData.getText() + "\n");
+//		}
 		for(int i=0;i<decisionAttributes.size();i++){
 			UserInterface.logData.setText(UserInterface.logData.getText() + "Distribution of values for attribute " + decisionAttributes.get(i) + "\n");
 			HashMap<String,Integer> possibleValues = getPossibleValuesFor(relation.attributeData.get(attributeIndexMap.get(decisionAttributes.get(i))).instanceValues);
@@ -49,16 +59,13 @@ public class Execute {
 			}	
 		}
 		
-		//Find the subsets of our nonDecision attributes
+		//Now iterate through all these combinations and calculate possible partitions --> coverings
 		for(Set<String> one : powerSet(nonDecisionAttributeSet)){
 			List<String> temp = new ArrayList<String>();
 	    	temp.addAll(one);
+	    	//Only check if it is not empty and does not exceed the max to consider
 	    	if(temp.size() != 0 && temp.size() <= maxNumAttrToConsider){checkIsCovering(temp);}
 		}
-		
-		//Now iterate through all these combinations and calculate possible partitions --> coverings
-//		System.out.println("Checking on size: " + nonDecisionAttributeSet.toString());
-//		processSubsets(nonDecisionAttributeSet, 2);
 		return allCoverings;
 	}
 	
@@ -66,7 +73,7 @@ public class Execute {
 //		System.out.println("Checking on size: " + oneAttrCombo.size() + " oneAttrCombo: " + oneAttrCombo.toString());
 		//Get partition for this combination of non decision attributes
 		Set<List<Integer>> singlePartition = computePartition(oneAttrCombo);
-		System.out.println("Partition for:" + oneAttrCombo + " partition: " + singlePartition.toString());
+//		System.out.println("Partition for:" + oneAttrCombo + " partition: " + singlePartition.toString());
 		//Check to see if it's a possible covering
 		if(isCoveringCanidate(singlePartition, decisionPartition)) {
 			System.out.println("Found one that could be a covering!");
@@ -85,7 +92,6 @@ public class Execute {
 				}
 			}
 			if(foundLarger){
-//				System.out.println("I've found a larger");
 				allCoverings.remove(temp);
 				allCoverings.add(oneAttrCombo);
 			} else if(isLarger) {
@@ -100,7 +106,7 @@ public class Execute {
 	public void printAllCovering(){
 		System.out.println("Here are teh coverings");
 		for(List<String> line:allCoverings){
-			System.out.println(line.toString());
+//			System.out.println(line.toString());
 		}
 	}
 	
@@ -209,27 +215,6 @@ public class Execute {
 		return true;
 	}
 	
-	/*
-	public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
-		Set<Set<T>> sets = new HashSet<Set<T>>();
-		if (originalSet.isEmpty()) {
-			sets.add(new HashSet<T>());
-			return sets;
-		}
-		List<T> list = new ArrayList<T>(originalSet);
-		T head = list.get(0);
-		Set<T> rest = new HashSet<T>(list.subList(1, list.size())); 
-		for (Set<T> set : powerSet(rest)) {
-			Set<T> newSet = new HashSet<T>();
-			newSet.add(head);
-			newSet.addAll(set);
-			sets.add(newSet);
-			sets.add(set);
-		}		
-		return sets;
-	}
-	*/
-	
 	public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
 		Set<Set<T>> ps = new HashSet<Set<T>>();
 		ps.add(new HashSet<T>());
@@ -249,31 +234,28 @@ public class Execute {
 		  return ps;
 	}
 	
-	//TODO pass in the decision attributes as well?
-	public void runRICO(Set<List<String>> covering,List<String> decision, int minCoverage){
+	//Run RICO to induce our rules!
+	public void runRICO(Set<List<String>> covering,List<String> decision, int minCoverage, boolean dropConditions){
 		//A hash map to store our results...this seems so unnecessary
 		List<HashMap<List<HashMap<String,String>>,Integer>> results = new ArrayList<HashMap<List<HashMap<String,String>>,Integer>>();
 		
 		for(List<String> oneCovering:covering){
 			//Initialize E to the set of all instances (For us, our original data)
 			List<Attribute> E = relation.attributeData;
-			//Make something to hold a single Hash of values and counts
+			//Make something to hold a single Hash of attributes and counts
 			HashMap<List<HashMap<String,String>>,Integer> resultForSingleCovering = new HashMap<List<HashMap<String,String>>,Integer>();
 			for(int i=0;i<E.get(0).instanceValues.size();i++){
 				List<HashMap<String,String>> rules = new ArrayList<HashMap<String,String>>();
 				for(int j=0;j<oneCovering.size();j++){
-//					System.out.println("i: " + i + " j: " + j);
 					HashMap<String,String> rulePair = new HashMap<String,String>();
 					rulePair.put(oneCovering.get(j), E.get(attributeIndexMap.get(oneCovering.get(j))).instanceValues.get(i));
 					rules.add(rulePair);
-					//E.get(attributeIndexMap.get(oneCovering.get(j))).instanceValues.remove(i);
 				}
 				//Put in the decision as the last one
 				for(int j=0;j<decision.size();j++){
 					HashMap<String,String> rulePair = new HashMap<String,String>();
 					rulePair.put(decision.get(j), E.get(attributeIndexMap.get(decision.get(j))).instanceValues.get(i));
 					rules.add(rulePair);
-//					rules.add(E.get(attributeIndexMap.get(decision.get(j))).instanceValues.get(i));
 				}
 				if(!resultForSingleCovering.containsKey(rules)){
 					resultForSingleCovering.put(rules,1);
@@ -282,37 +264,72 @@ public class Execute {
 					resultForSingleCovering.put(rules, incCount);
 				}
 			}
+			//Print more data to the GUI for the user
 			UserInterface.logData.setText(UserInterface.logData.getText() + "Rules for covering " + oneCovering.toString() + "\n");
 			for(List<HashMap<String, String>> oneResult:resultForSingleCovering.keySet()){//Something happens around here if the min coverage is higher than the highest covering
-				//Only return results that are >= our minCoverage
-				if(resultForSingleCovering.get(oneResult) < minCoverage){
-					resultForSingleCovering.remove(oneResult);
+				if(dropConditions){
+
+					//Here we want to prune!
+					//This is gross. It can't be good.
+					List<String> goodGuys = new ArrayList<String>();
+					for(HashMap<String, String> mapOneResult:oneResult){
+						for(String key:mapOneResult.keySet()){ //Should only be 1 in each of these
+							//						System.out.println("3with this: " + checkNumOccurences(key,mapOneResult.get(key)) + " and " + resultForSingleCovering.get(oneResult));
+							if( !decision.contains(key) && checkNumOccurences(key,mapOneResult.get(key)) == resultForSingleCovering.get(oneResult)){
+								goodGuys.add(key);
+							}
+						}
+					}
+					List<HashMap<String,String>> tempForPrint = new ArrayList<HashMap<String,String>>();
+					for(HashMap<String,String> tired:oneResult){
+						System.out.println("Trying: " + tired);
+						tempForPrint.add((HashMap<String,String>)tired.clone());
+					}
+					boolean foundOne = false;
+					for(HashMap<String,String> mapOneResult:oneResult){
+						for(String key:mapOneResult.keySet()){
+							if(!foundOne && !goodGuys.contains(key) && !decision.contains(key)){
+								System.out.println("Jack just got replaced!");
+								tempForPrint.get(oneResult.indexOf(mapOneResult)).put(key, "_");
+								foundOne = true;
+							}
+						}	
+					}
+
+					//Only return results that are >= our minCoverage
+					System.out.println("Was failing: " + resultForSingleCovering.get(oneResult) + " " + minCoverage);
+					if(resultForSingleCovering.get(oneResult) < minCoverage){
+						resultForSingleCovering.remove(oneResult);
+					} else {
+						UserInterface.logData.setText(UserInterface.logData.getText() + "[" + tempForPrint.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
+					}
 				} else {
-					UserInterface.logData.setText(UserInterface.logData.getText() + "[" + oneResult.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
-				}
-				//Here we want to prune!
-				for(HashMap<String, String> mapOneResult:oneResult){
-//					if(mapOneResult.)
+					//Only return results that are >= our minCoverage
+					System.out.println("Was failing: " + resultForSingleCovering.get(oneResult) + " " + minCoverage);
+					if(resultForSingleCovering.get(oneResult) < minCoverage){
+						resultForSingleCovering.remove(oneResult);
+					} else {
+						UserInterface.logData.setText(UserInterface.logData.getText() + "[" + oneResult.toString() + ", " + resultForSingleCovering.get(oneResult) + "]\n");
+					}
 				}
 			}
+			
 			UserInterface.logData.setText(UserInterface.logData.getText() + "\n\n");
 			results.add(resultForSingleCovering);
+			allCoverings = new HashSet<List<String>>();
 		}
-//		for(HashMap<List<HashMap<String, String>>, Integer> oneHash:results){
-//			System.out.println("New covering");
-//			for(List<HashMap<String, String>> oneThingy:oneHash.keySet()){
-//				System.out.println(oneThingy.toString() + ", " + oneHash.get(oneThingy));
-//			}
-//		}
 	}
 	
-	public int checkNumOccurences(String value){
+	public int checkNumOccurences(String attribute, String value){
+//		System.out.println("Value: " + value);
 		int sum = 0;
-		for(int i=0;i<relation.attributeData.get(0).instanceValues.size();i++){
-			if(relation.attributeData.get(attributeIndexMap.get(value)).instanceValues.get(i).equals(value)){
+		for(int i=0;i<relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.size();i++){
+//			System.out.println("HereONCE: " + relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.get(i));
+			if(relation.attributeData.get(attributeIndexMap.get(attribute)).instanceValues.get(i).equals(value)){
 				sum++;
 			}
 		}
+//		System.out.println(sum);
 		return sum;
 	}
 }

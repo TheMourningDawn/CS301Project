@@ -125,6 +125,7 @@ public class UserInterface extends JFrame implements ActionListener {
 		}
 		DefaultComboBoxModel model2 = new DefaultComboBoxModel(minCoverageOptions);
 		minCoverage.setModel(model2);
+		minCoverage.setSelectedIndex(1);
 		minCoverage.setPreferredSize(new Dimension(100,25));
 		minCoverage.setEnabled(false);//Make it unusable until the user selects the file so it gets filled
 		minCoverage.addActionListener(this);
@@ -186,6 +187,7 @@ public class UserInterface extends JFrame implements ActionListener {
 				//Fill combo box with all attributes to select the decision attr
 				DefaultComboBoxModel decisionAttrModel = new DefaultComboBoxModel(runAlgorithm.attributeIndexMap.keySet().toArray());
 				decisionAttrCbo.setModel(decisionAttrModel);
+				decisionAttrCbo.setSelectedIndex(1);
 				
 				//Fill the max number of attr to use (Up to the max available (minus) decision attributes)
 				String[] maxNumTemp = new String[runAlgorithm.attributeIndexMap.size()];
@@ -195,6 +197,7 @@ public class UserInterface extends JFrame implements ActionListener {
 				}
 				DefaultComboBoxModel maxNumAttrModel = new DefaultComboBoxModel(maxNumTemp);
 				maxNumAttr.setModel(maxNumAttrModel);
+				maxNumAttr.setSelectedIndex(1);
 				
 				//Set the controls to enabled so we can start our algorithm!
 				//TODO: Have to actually fill these controls so they can do something
@@ -213,7 +216,7 @@ public class UserInterface extends JFrame implements ActionListener {
 //				decAttr.add(decisionAttrCbo.getSelectedItem().toString());
 				runAlgorithm.runOne(decAttr,Integer.parseInt(maxNumAttr.getSelectedItem().toString()));
 				runAlgorithm.printAllCovering();
-				runAlgorithm.runRICO(runAlgorithm.allCoverings,decAttr,Integer.parseInt(minCoverage.getSelectedItem().toString()));
+				runAlgorithm.runRICO(runAlgorithm.allCoverings,decAttr,Integer.parseInt(minCoverage.getSelectedItem().toString()),dropUnnecessary.isSelected());
 			} else {
 				logData.setText(logData.getText()+ "Please select your covering attributes!\n\n");
 			}
