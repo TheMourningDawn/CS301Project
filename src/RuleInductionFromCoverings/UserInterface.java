@@ -4,7 +4,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class UserInterface extends JFrame implements ActionListener {
 	JTextField decisionAttrTextBox;
 
 	JComboBox<String> decisionAttrCbo;
-	JComboBox<String> maxNumAttr;
+	public JComboBox<String> maxNumAttr;
 	JComboBox<String> minCoverage;
 
 	JCheckBox dropUnnecessary;
@@ -212,7 +211,7 @@ public class UserInterface extends JFrame implements ActionListener {
 			if(!decisionAttrTextBox.getText().equals("")){
 				List<String> decAttr = Arrays.asList(decisionAttrTextBox.getText().split(","));
 //				decAttr.add(decisionAttrCbo.getSelectedItem().toString());
-				runAlgorithm.runOne(decAttr);
+				runAlgorithm.runOne(decAttr,Integer.parseInt(maxNumAttr.getSelectedItem().toString()));
 				runAlgorithm.printAllCovering();
 				runAlgorithm.runRICO(runAlgorithm.allCoverings,decAttr,Integer.parseInt(minCoverage.getSelectedItem().toString()));
 			} else {

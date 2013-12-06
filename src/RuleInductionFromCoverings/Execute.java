@@ -25,7 +25,7 @@ public class Execute {
 	  
 	//Trying some stuff here
 	//This method might turn into caculateAllCoverings...or something to that effect
-	public Set<List<String>> runOne(List<String> decisionAttributes){
+	public Set<List<String>> runOne(List<String> decisionAttributes, int maxNumAttrToConsider){
 		UserInterface.logData.setText(UserInterface.logData.getText() + "Decision Attributes: " + decisionAttributes + "\n");
 		//Print out our possible values for all decision attributes
 		for(int i=0;i<decisionAttributes.size();i++){
@@ -53,7 +53,7 @@ public class Execute {
 		for(Set<String> one : powerSet(nonDecisionAttributeSet)){
 			List<String> temp = new ArrayList<String>();
 	    	temp.addAll(one);
-	    	if(temp.size() != 0){checkIsCovering(temp);}
+	    	if(temp.size() != 0 && temp.size() <= maxNumAttrToConsider){checkIsCovering(temp);}
 		}
 		
 		//Now iterate through all these combinations and calculate possible partitions --> coverings
